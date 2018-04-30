@@ -1,0 +1,7 @@
+<div *ngIf="!auth.authenticated">
+  <formio [src]="service.registerForm" (submit)="service.onRegisterSubmit($event)"></formio>
+</div>
+
+<div *ngIf="auth.authenticated">
+  <p>You are already Logged in - go to <a routerLink="/portal">dashboard</a> </p>
+</div>
