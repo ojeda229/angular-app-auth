@@ -15,11 +15,9 @@
         </li>
       </ul>
 
-
-
       <ul class="nav navbar-nav ml-auto">
         <li class="nav-item dropdown" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" *ngIf="!auth.authenticated">
-          <a class="nav-link dropdown-toggle" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
             Access
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -30,11 +28,12 @@
         </li>
 
         <li class="nav-item dropdown" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" *ngIf="auth.authenticated">
-          <a class="nav-link dropdown-toggle" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+          <a class="nav-link dropdown-toggle" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {{ userEmail }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" routerLink="/" (click)="auth.logout()">Logout</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" routerLink="/auth/login" (click)="auth.logout()">Logout</a>
           </div>
         </li>
       </ul>

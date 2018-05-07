@@ -1,5 +1,5 @@
 <div *ngIf="!reset">
-  <formio src="https://hzdutrqoproktql.form.io/sendreset" (submit)="onSubmit($event)"></formio>
+  <formio [src]="mailerEmbedURL" (submit)="onSubmit($event)"></formio>
 </div>
 
 <div *ngIf="reset">

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormioAuthService, FormioAuthLoginComponent } from 'angular-formio/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -8,11 +9,14 @@ import { FormioAuthService, FormioAuthLoginComponent } from 'angular-formio/auth
 })
 export class LoginComponent extends FormioAuthLoginComponent implements OnInit {
 
-  constructor(public auth: FormioAuthService) {
+  constructor(public auth: FormioAuthService, private router: Router) {
     super(auth);
+  }
+
+  onSubmit(event) {
+    this.router.navigate(['/dashboard']);
   }
 
   ngOnInit() {
   }
-
 }

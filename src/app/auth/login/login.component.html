@@ -1,8 +1,8 @@
 <div *ngIf="!auth.authenticated">
-  <formio [src]="service.loginForm" (submit)="service.onLoginSubmit($event)"></formio>
-  <p><a routerLink="/auth/resetpass">Reset Password</a></p>
+  <formio [src]="service.loginForm" (submit)="service.onLoginSubmit($event); onSubmit($event)"></formio>
+  <p><a routerLink="/auth/mailer">Reset Password</a></p>
 </div>
 
 <div *ngIf="auth.authenticated">
-  <p>You are already Logged in - go to <a routerLink="/portal">dashboard</a> </p>
+  <p>You are already Logged in - go to <a routerLink="/dashboard">dashboard</a> </p>
 </div>
