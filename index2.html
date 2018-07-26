@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://unpkg.com/formiojs@latest/dist/formio.full.min.css'>
+    <script src='https://unpkg.com/formiojs@latest/dist/formio.full.min.js'></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type='text/javascript'>
+      //Change this demo data for your own credentials if needed
+      var formUrl = 'https://txldfslqpskadvo.form.io/formularioDeAprobacionDeCompra';
+      var envUrl = 'https://717-rlu3rven.api.processmaker.io/api/v1';
+      var accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImM5NzYzNmZjM2JiMWI4ZGE3NDc4OTFjYjBmYTk0Y2Q3N2JmNzcyMTVjYzllZGQ2Y2ZiN2RmMzI0ZDVlMWM0MDc3MzlhYzQzOGM4MzJlYmNmIn0.eyJhdWQiOiI3NDY3NDQwNyIsImp0aSI6ImM5NzYzNmZjM2JiMWI4ZGE3NDc4OTFjYjBmYTk0Y2Q3N2JmNzcyMTVjYzllZGQ2Y2ZiN2RmMzI0ZDVlMWM0MDc3MzlhYzQzOGM4MzJlYmNmIiwiaWF0IjoxNTMyNDU1NTA2LCJuYmYiOjE1MzI0NTU1MDYsImV4cCI6MTU2Mzk5MTUwNiwic3ViIjoiMSIsInNjb3BlcyI6W119.l4VX0-5c-qQWYCJaoqv9zfuKsjjpUkihrrMJyaf1ZDURvlKXJMmubuYrOa7dmASDwH0UdEIgzpbkWJK8Jo3x4i-zKBlHpIkdPbgfF5HkijkSRgQR5AMCsKAh2n0wFLWccgwlJW1S55xHl_Z1x1CqCO_B4KXJJ2Gi-tLnrRRJKnMTjk-jXR1-m1z2hSl97QclgFQZOst-SR953ZO1Uz1NzvH9uD3mBOI4PMJwT1Kpqfy5nazMd7F5GF8_cbJIQ2d8GaqPc_6cIJmrD73gbp0Eg8r8QeZ65bbEmvNLw0mnN7K4X37XpolBM-IVlztu66ycHAzUH_GadQtYjBgWaHZRUd1qfaSbqJI05PKdlOmpiy-HWtwww0k1GZ9ZvqazFx3G-Hl3O2o1WlEjruNCScTuT8NFRUHkhes2MmKWe0_qwaWQn9su7sV3iNhFHAHKuO01YvnOxgFfzCnoSKUERxKXs_InG4N4hFqsOtdBycyoXxquUNSOzaUUkYyzO4HZmkKH3ebaXJp8bySEQzBBMvmKTT5U-nOagS_sapXLWvEsYzm_gt_xfueGYD1n9vRV-0gr2rHnW0Sfi9RqUd4e45taKuyYDCtnBIcPWPuH-NtKxzQ0j6u68L2SHPIiWYhWLsGRlPusPNACJswf4t42B6-97fQIAEL9t_RMrdrYF0Smsp8';
+      //Change this demo data for your own credentials if needed
+    var taskInstanceId = '';
+    
+     function makeDecision(decision, comment) {
+      	datamodel = {
+        	approverComment:comment,
+          approved:decision
+        };
+        var data = {
+                      'data': {
+                          'type':'task_instance',
+                          'attributes': {
+                              'status':'COMPLETE',
+                              'content':datamodel
+                          }
+                      }
+                  };
+        
+        client.patch('task_instances/'+taskInstanceId+'?include=data_model', data
+        ).then(function(response){
+        	$('#formio').html('<h3>You\'ve made decision. To approve another request, please refresh this page.</h3>');
+        })
+      }
+      
+    function loadForm(data={}) {
+     Formio.createForm(document.getElementById('formio'), formUrl).then(function(form) {
+      console.log(form);
+      document.querySelector('button.btn-success').onclick = function(event){
+      			makeDecision('yes', document.querySelector('.approverComment textarea').value);
+     	}
+      document.querySelector('button.btn-danger').onclick = function(event){
+      			makeDecision('no', document.querySelector('.approverComment textarea').value);
+     	}
+     form.submission = {
+    		data: data
+  		};
+      
+});
+      };
+      
+      var client = new axios.create({
+      	                baseURL: envUrl,
+                        headers: {
+                            "content-type": "application/json",
+                            "Accept": "application/json",
+                            'Authorization': 'Bearer ' + accessToken
+                        }
+      });
+      client.get('task_instances/delegated', { params: {
+      		per_page:1,
+          include:'data_model'
+      	}
+      }).then(function(response){
+      	if (response.data.meta.pagination.count >= 1)
+        //Get prefilled data and set to form io and get task instace id
+        {
+        $('#formio').html('');
+        	taskInstanceId = response.data.data[0].id;
+        	//Empty structure for fields id no data in datamodel
+          var prefilledData = {};
+          //Check data in datamodel
+          if (response.data.included[0].attributes.dataModel.request) {
+            prefilledData = response.data.included[0].attributes.dataModel.request.data;
+          } 
+          
+          loadForm(prefilledData);
+        } else 
+        	$('#formio').html('<center><div class="col-xs-8 col-xs-offset-2"><h3>No purchase requests found. Submit a purchase request.</h3></div><center>');
+      });
+      
+    </script>
+  </head>
+  <body>
+  <div class="col-xs-10 col-xs-offset-1">
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Purchase request demo</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <!--Change this navigation links before publish forms in some other place-->
+        <li><a href="index.html">Request form<span class="sr-only">(current)</span></a></li>
+        <li class="active"><a href="index2.html">Approve form</a></li>
+        <!--Change this navigation links before publish forms in some other place-->
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+    <div id='formio'>
+      <center>
+      <h3>
+      Checking requests...
+      </h3>
+      </center>
+    </div>
+    </div>
+  </body>
+</html>
